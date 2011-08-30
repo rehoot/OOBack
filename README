@@ -1,0 +1,43 @@
+OOBack.py README file
+
+Purpose:
+1) Read a configuration file in ~/.OOBack.cfg to get a list
+   of file specifications (with wildcards) to archive. The
+   list does not look recursively into subdirectories.
+   My configfile looks like this:
+
+[defaults]
+gitdir = /D/gits/OO
+
+[archivefiles]
+file1 = /Draft/*.odt
+
+2) Copy selected OpenOffice files to an archive directory,
+   that is specified in the ~/.OOBack.cfg file,
+   unzip each one into its own directory, use git to archive the
+   files that are zipped inside the .odtfiles.
+3) Assume that the user has already created a directory where 
+   COPIES of OpenOffice files will be sent for archive,
+   and assume that the user has run "git init" and some initial
+   config commands:
+	   git config −−global user.name YOUR-USERNAME
+  	 git config --glocal user.email YOUREMAIL@YAHOO.COM
+4) On the first run, the user will be prompted for the name of 
+   the pre-existing archive directory and some path specifications
+   (with optional wildcards) of OpenOffice files to archive 
+   (like ~/Documents/MyNovel/*.odt).
+   The current program does not support recursive file specification,
+   so enter each directory separately.
+5) After the first run, the ~/.OOBack.cfg config files is read
+   to identify the files to archive
+
+RECOVERY INSTRUCTIONS:
+1) From the UNIX command line, change directory to be inside 
+   the unzipped directory.
+2) run a command like this:
+      zip -r ../recovered.odt mimetype .
+   which puts the "mimetype" file first in the zip file and also 
+   zips all the other files in the directory.
+3) to add (or replace) only the contents.xml file to an existing .odt file:
+      zip ../existing.odt content.xml
+
