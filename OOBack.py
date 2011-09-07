@@ -41,6 +41,7 @@ import datetime
 import getopt
 from glob import glob
 import os
+import re
 import shutil
 import stat
 import sys
@@ -152,28 +153,31 @@ def main():
 					if not os.access(destdir, os.F_OK):
 						os.mkdir(destdir)
 					else:
-						#mode = os.stat(destdir)
-						#if not stat.S_ISDIR(mode.st_mode):
 						# create the directory if it does not exist
 						os.system('rm -R ' + destdir)
 						os.mkdir(destdir)
 		
-					# copy the file into a subdirectory of the same name
+					# Copy the file into a subdirectory of the same name
 					shutil.copy(source_fname, destfile)
 					os.chdir(destdir)
 					if ext == '.odt':
 						os.system('unzip ' + destfile + ' -d ' + destdir)
-						# now remove the original .odt file from within the unzip directory.
+						# Remove the original .odt file from within 
+						# the unzip directory.
 						os.remove(destdir + '/' + f)
+						# insert EOL into the contents.xml file to make
+						# archiving more efficient.  This means that the
+						# newline chars must be removed to recover the files.
+						expand_contents(destdir + '/content.xml')
 				else:
 					print('Error, cannot find ' + source_fname)
 	
-		# run git
-	os.chdir(gd_opts['gitdir'])
-	os.system('git add .')
-	os.system('git add -u .')
-	os.system('git commit -m "auto commit ' \
-		+ datetime.datetime.now().strftime("%Y %h %d %H:%M:%S") + '"')
+	## run git
+	#os.chdir(gd_opts['gitdir'])
+	#os.system('git add .')
+	#os.system('git add -u .')
+	#os.system('git commit -m "auto commit ' \
+	#	+ datetime.datetime.now().strftime("%Y %h %d %H:%M:%S") + '"')
 	print('')
 
 	
@@ -277,6 +281,32 @@ def setup():
 	#yn = input('press any key to continue archiving')	
 	print('This processed the file specifications in ' + g_config_fname)
 
+#
+def expand_contents(fname):
+	# open a contents.xml file,
+	# expand a few tags to insert new lines
+	global  g_mycodec
+
+	buff = []
+
+	try:
+		fcontents = codecs.open(fname, 'r', g_mycodec)
+	except IOError:
+		raise Exception("file not found " + fname)
+	for s in fcontents:
+		buff.append(s)
+	fcontents.close
+
+	for j in range(len(buff)):
+		buff[j] = re.sub(re.compile(' xmlns[:]'), '\nxmlns:', buff[j])
+		buff[j] = re.sub(re.compile('[<]text[:]'), '\n<text:', buff[j])
+		buff[j] = re.sub(re.compile('[<]style[:]'), '\n<style:', buff[j])
+
+	dprint(4, 'The buffer is now: ' + repr(buff))
+	fo = codecs.open(fname, 'w', g_mycodec)
+	for j in range(len(buff)):
+		fo.write(buff[j])
+	
 #
 def dprint(dbglevel, txt):
 	global g_debug_level
