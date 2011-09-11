@@ -172,12 +172,12 @@ def main():
 				else:
 					print('Error, cannot find ' + source_fname)
 	
-	## run git
-	#os.chdir(gd_opts['gitdir'])
-	#os.system('git add .')
-	#os.system('git add -u .')
-	#os.system('git commit -m "auto commit ' \
-	#	+ datetime.datetime.now().strftime("%Y %h %d %H:%M:%S") + '"')
+	# run git
+	os.chdir(gd_opts['gitdir'])
+	os.system('git add .')
+	os.system('git add -u .')
+	os.system('git commit -m "auto commit ' \
+		+ datetime.datetime.now().strftime("%Y %h %d %H:%M:%S") + '"')
 	print('')
 
 	
